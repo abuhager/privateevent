@@ -1,0 +1,40 @@
+﻿@{
+    ViewBag.Title = "University Event Management";
+}
+
+<div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 100vh; background: #f5f7fa;">
+    <div class="card p-4" style="width: 380px;">
+        <div class="d-flex flex-column align-items-center mb-3">
+            <span style="font-size: 48px; color: #2574fb;">
+                <i class="fa fa-calendar"></i>
+            </span>
+            <h4 class="mt-2 mb-1">University Event Management</h4>
+            <div style="color: #666;">Sign in to access your account</div>
+        </div>
+
+        <form asp-controller="Login" asp-action="Log" method="post">
+            <div class="mb-3">
+                <label class="form-label">University Email</label>
+                <input type="email" name="email" class="form-control" placeholder="your.email@university.edu" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-control" placeholder="Enter your password" required />
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Sign In</button>
+        </form>
+
+        @if (ViewBag.Error != null)
+        {
+            <div style="color:red; margin-top: 10px;">@ViewBag.Error</div>
+        }
+
+        <div class="card mt-3">
+            <div class="card-body p-2">
+                <strong>Demo Credentials:</strong><br>
+                <span><b>Admin:</b> admin@example.com / Admin123!</span><br>
+                <span><b>Student:</b> student@example.com / Student123!</span>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,60 @@
+﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <meta charset="utf-8" />
+    <title>@ViewBag.Title - UniEvents</title>
+    <link href="~/css/site.css" rel="stylesheet" />
+</head>
+<body>
+    @{
+        var userRole = HttpContextAccessor.HttpContext.Session.GetString("UserRole");
+        var userId = HttpContextAccessor.HttpContext.Session.GetInt32("UserId");
+    }
+    <nav style="background: #178957; color: white; padding: 10px 0;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="margin-left: 16px;">
+                <span style="font-weight: bold;">
+                    <a href="/" class="btn btn-outline-success" style="color: #fff; margin: 0 8px;">
+                        <img src="~/images/zitouna.jpg" alt="جامعة الزيتونة" class="img-fluid rounded mb-3" style="max-height: 40px;"> UniEvents
+                    </a>
+                </span>
+                @if (userId != null)
+                {   
+                    if (userRole == "Admin")
+                    {
+                        <a href="/User/index2" style="color: white; margin: 0 8px;">Home</a>
+                        <a href="/Admin/Dashboard" style="color: white; margin: 0 8px;">Dashboard</a>
+                        <a href="/Admin/ManageEvents" style="color: white; margin: 0 8px;">Manage Events</a>
+                        <a href="/Admin/Users" style="color: white; margin: 0 8px;">Users</a>
+                    }
+                    else // Student
+                    {
+                        <a href="/User/index" style="color: white; margin: 0 8px;">Home</a>
+                        <a href="/Events" style="color: white; margin: 0 8px;">Events</a>
+                        <a href="/Bookings" style="color: white; margin: 0 8px;">My Bookings</a>
+                        <a href="/Profile" style="color: white; margin: 0 8px;">Profile</a>
+                    }
+                }
+            </div>
+            <div style="margin-right: 16px;">
+                @if (userId == null)
+                {
+                    <a href="/Login/Log" class="btn btn-outline-success" style="color:#fff;">Login</a>
+                }
+                else
+                {
+                    <a href="/User/Logout" class="btn btn-outline-success" style="color:#fff;">Logout</a>
+                }
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        @RenderBody()
+    </main>
+</body>
+</html>
