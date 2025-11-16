@@ -12,7 +12,6 @@ namespace project.Controllers
         {
             public IActionResult Index()
             {
-                // لو أردت تمرير بيانات ديناميكية للصفحة استخدم ViewBag أو ViewModel
                 return View();
             }
            

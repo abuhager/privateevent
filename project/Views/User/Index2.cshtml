@@ -1,6 +1,12 @@
 ﻿@{
     ViewBag.Title = "Welcome to UniEvents";
 }
+@{
+    Context.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+    Context.Response.Headers["Pragma"] = "no-cache";
+    Context.Response.Headers["Expires"] = "0";
+}
+
 
 <div class="container" style="margin-top: 50px;">
     <div class="text-center mb-4">
