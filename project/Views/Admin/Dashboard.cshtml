@@ -1,0 +1,28 @@
+﻿@model List<project.Models.Event>
+@{
+    ViewBag.Title = "Admin Dashboard";
+}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>لوحة تحكم الأدمن</h2>
+        <a href="@Url.Action("CreateEvent", "Admin")" class="btn btn-success">+ إضافة فعالية جديدة</a>
+    </div>
+    <div class="row">
+        @foreach (var ev in Model)
+        {
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body" style="background-color:#178957">
+                        <h5 class="card-title">@ev.Title</h5>
+                        <p class="card-text">@ev.Description</p>
+                        <p><strong>التاريخ:</strong> @ev.Date.ToString("yyyy-MM-dd")</p>
+                        <p><strong>المكان:</strong> @ev.Location</p>
+                        <a href="@Url.Action("EditEvent", "Admin", new { id = ev.Id })" class="btn btn-warning">تعديل</a>
+                        <a href="@Url.Action("DeleteEvent", "Admin", new { id = ev.Id })" class="btn btn-danger">حذف</a>
+                        <a href="@Url.Action("ViewStudents", "Admin", new { id = ev.Id })" class="btn btn-primary">عرض الطلاب المسجلين</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

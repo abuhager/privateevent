@@ -1,0 +1,36 @@
+﻿@model project.Models.Event
+@{
+    ViewBag.Title = "تفاصيل فعالية";
+    var isBooked = ViewBag.IsBooked != null && (bool)ViewBag.IsBooked;
+}
+
+<div class="container mt-4">
+    <h2>@Model.Title</h2>
+    <div class="mb-2"><strong>الوصف:</strong> @Model.Description</div>
+    <div class="mb-2"><strong>التاريخ:</strong> @Model.Date.ToString("yyyy-MM-dd")</div>
+    <div class="mb-2"><strong>الوقت:</strong> @Model.StartTime</div>
+    <div class="mb-2"><strong>المكان:</strong> @Model.Location</div>
+    <div class="mb-2"><strong>التخصص:</strong> @Model.major</div>
+    <div class="mb-2"><strong>سعة الفعالية:</strong> @Model.Limit</div>
+
+    @if (isBooked)
+    {
+        <a href="@Url.Action("CancelBooking", "Student", new { eventId = Model.Id })"
+           class="btn btn-danger mt-2"
+           onclick="return confirm('هل أنت متأكد من إلغاء الحجز؟')">إلغاء الحجز</a>
+    }
+    else
+    {
+        <form asp-action="BookEvent" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="eventId" value="@Model.Id" />
+            <button type="submit" class="btn btn-success mt-3">حجز الفعالية</button>
+        </form>
+    }
+
+
+    @if (TempData["msg"] != null)
+    {
+        <div class="alert alert-success mt-2">@TempData["msg"]</div>
+    }
+</div>

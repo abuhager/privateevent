@@ -1,4 +1,9 @@
 ﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@{
+    Context.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+    Context.Response.Headers["Pragma"] = "no-cache";
+    Context.Response.Headers["Expires"] = "0";
+}
 
 <!DOCTYPE html>
 <html>
@@ -45,17 +50,18 @@
                 <div style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;font-size: 2rem">UniEvents</div>
             </a>
             <div style="margin-right: 16px;font-size: 1rem;">
-                @if (userId != null){
-                @userRole 
-                @username
-                }
+                
                 @if (userId == null)
                 {
+                   
                     <a href="/Login/Log" class="btn btn-outline-success" style="color:#fff;">Login</a>
                 }
 
                 else
                 {
+
+                    @userRole
+                    @username
                     <a href="/User/Logout" class="btn btn-outline-success" style="color:#fff;">Logout</a>
                 }
             </div>

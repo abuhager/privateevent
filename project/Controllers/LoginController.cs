@@ -12,10 +12,14 @@ namespace project.Controllers
             _context = context;
         }
 
-        // GET: /Login/Log
         public IActionResult Log()
+
         {
-            return View();
+             if (HttpContext.Session.GetString("UserRole") != null)
+                return RedirectToAction("index", "Home");
+            
+
+                return View(); 
         }
 
         [HttpPost]
@@ -24,7 +28,7 @@ namespace project.Controllers
             var user = _context.Users.FirstOrDefault(u => u.Email == email && u.Password == password);
             if (user == null)
             {
-                ViewBag.Error = "بيانات دخول غير صحيحة";
+                ViewBag.Error = "unvalid data";
                 return View();
             }
 

@@ -1,0 +1,32 @@
+﻿@model List<project.Models.Event>
+@{
+    ViewBag.Title = "قائمة الفعاليات";
+    var statusDict = ViewBag.StatusDict as Dictionary<int, string>;
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">الفعاليات المتاحة</h2>
+    <div class="row">
+        @foreach (var ev in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">@ev.Title</h5>
+                        @{
+                            var state = statusDict?[ev.Id] ?? "غير مسجل";
+                        }
+                        <span class="badge @(state == "active" ? "bg-success" : state == "cancelled" ? "bg-warning" : "bg-secondary") mb-2">
+                            حالتك: @state
+                        </span>
+                        <p>@ev.Description</p>
+                        <p><strong>التاريخ:</strong> @ev.Date.ToString("yyyy-MM-dd")</p>
+                        <p><strong>المكان:</strong> @ev.Location</p>
+                        <a href="@Url.Action("BookEvent", "Student", new { eventId = ev.Id })" class="btn btn-primary">عرض التفاصيل</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+ 

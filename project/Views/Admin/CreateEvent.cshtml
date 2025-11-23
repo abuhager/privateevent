@@ -1,0 +1,42 @@
+﻿@model project.Models.Event
+@{
+    ViewBag.Title = "إضافة فعالية";
+}
+<form asp-action="CreateEvent" method="post">
+    <div class="mb-3">
+        <label>عنوان الفعالية</label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label>الوصف</label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label>التاريخ</label>
+        <input asp-for="Date" type="date" class="form-control" />
+        <span asp-validation-for="Date" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label>الوقت</label>
+        <input asp-for="StartTime" type="time" class="form-control" />
+        <span asp-validation-for="StartTime" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label>المكان</label>
+        <input asp-for="Location" class="form-control" />
+        <span asp-validation-for="Location" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label>التخصص</label>
+        <input asp-for="major" class="form-control" />
+        <span asp-validation-for="major" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label>الحد الأعلى للمقاعد</label>
+        <input asp-for="Limit" type="number" class="form-control" />
+        <span asp-validation-for="Limit" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-success">حفظ</button>
+</form>
