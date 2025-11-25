@@ -18,5 +18,6 @@ namespace project.Models
         public string? UImage { get; set; }
         [Required]
         public string Role { get; set; }
+        public ICollection<Roll> Rolls { get; set; }
     }
 }

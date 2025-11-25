@@ -18,6 +18,6 @@ namespace project.Models
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "Capacity must be at least 1")]
         public int Limit { get; set; }
-
+        public ICollection<Roll> Rolls { get; set; }
     }
 }
