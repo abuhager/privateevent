@@ -1,0 +1,42 @@
+﻿﻿@{
+ViewBag.Title = "Welcome to UniEvents";
+
+}
+@{
+    Context.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+    Context.Response.Headers["Pragma"] = "no-cache";
+    Context.Response.Headers["Expires"] = "0";
+}
+
+
+<div class="container" style="margin-top: 40px;">
+    <h2 class="text-center mb-1">Welcome to UniEvents</h2>
+    <div class="text-center mb-4" style="color: #666;">Your university event management platform</div>
+
+    <div class="row justify-content-center" style="gap: 20px;">
+        <div class="col-lg-3 col-md-4 col-10 card p-4 text-center" style="min-width:200px;">
+            <span style="font-size:32px;color:#2574fb;">
+                <i class="fa fa-calendar"></i>
+            </span>
+            <div class="fw-bold mt-2">Browse Events</div>
+            <div class="mb-3" style="color: #666;">Discover upcoming university events</div>
+            <a href="/Student/EventsList" class="btn btn-primary w-100">View Events</a>
+        </div>
+        <div class="col-lg-3 col-md-4 col-10 card p-4 text-center" style="min-width:200px;">
+            <span style="font-size:32px;color:#2574fb;">
+                <i class="fa fa-book"></i>
+            </span>
+            <div class="fw-bold mt-2">My Bookings</div>
+            <div class="mb-3" style="color: #666;">View and manage your registrations</div>
+            <a href="/Student/MyBookings" class="btn btn-primary w-100">My Bookings</a>
+        </div>
+        <div class="col-lg-3 col-md-4 col-10 card p-4 text-center" style="min-width:200px;">
+            <span style="font-size:32px;color:#2574fb;">
+                <i class="fa fa-user"></i>
+            </span>
+            <div class="fw-bold mt-2">Your Profile</div>
+            <div class="mb-3" style="color: #666;">View your student information</div>
+            <a href="/User/Profile" class="btn btn-primary w-100">View Profile</a>
+        </div>
+    </div>
+</div>

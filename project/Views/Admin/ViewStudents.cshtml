@@ -1,0 +1,82 @@
+﻿@model project.Models.Event
+@{
+    ViewBag.Title = "الطلاب المسجلين";
+    int currenactivetCount = ViewBag.ActiveCount ?? 0;
+    int currentwaitingCount = ViewBag.WaitingCount?? 0;
+    int currentCancelCount = ViewBag.CancelCount ?? 0;
+
+    
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg border-0 rounded-3">
+        <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
+            <h4 class="mb-0 fw-bold">
+                <i class="fas fa-users me-2"></i> الطلاب المسجلين في: @Model.Title
+            </h4>
+            <a asp-action="Dashboard" class="btn btn-light btn-sm fw-bold text-primary">عودة للوحة التحكم</a>
+        </div>
+
+        <div class="card-body p-4">
+            @if (Model.Rolls == null || !Model.Rolls.Any())
+            {
+                <div class="text-center py-4">
+                    <i class="fas fa-user-slash fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">لا يوجد طلاب مسجلين في هذه الفعالية حتى الآن.</h5>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>اسم الطالب</th>
+                                <th>البريد الإلكتروني</th>
+                                <th>حالة التسجيل</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var roll in Model.Rolls)
+                            {
+                                <tr>
+                                    <td class="fw-bold">@roll.User.Name</td>
+                                    <td>@roll.User.Email</td>
+                                    <td>
+                                        @if (roll.States == "active")
+                                        {
+                                            <span class="badge bg-success">نشط</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">@roll.States</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div style:display flex>
+                <div class="d-flex justify-content-end flex-wrap gap-2 mt-3">
+
+                    <div class="badge bg-secondary p-2 fs-6">
+                        <i class="fas fa-list"></i> الإجمالي: @Model.Rolls.Count
+                    </div>
+
+                    <div class="badge bg-success p-2 fs-6">
+                        <i class="fas fa-check-circle"></i> النشط: @currenactivetCount
+                    </div>
+
+                    <div class="badge bg-warning text-dark p-2 fs-6">
+                        <i class="fas fa-hourglass-half"></i> الانتظار: @currentwaitingCount
+                    </div>
+
+                    <div class="badge bg-danger p-2 fs-6">
+                        <i class="fas fa-times-circle"></i> الملغي: @currentCancelCount
+                    </div>
+
+                </div>
+            }
+        </div>
+    </div>
+</div>

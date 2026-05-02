@@ -1,0 +1,78 @@
+﻿@model project.Models.User
+
+@{
+    ViewBag.Title = "ملفي الشخصي";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow rounded-3 border-0">
+
+                <div class="card-header text-white text-center py-4" style="background-color: #178957;">
+                    <h3 class="mb-0 fw-bold">الملف الشخصي</h3>
+                </div>
+
+                <div class="card-body bg-light p-4 text-center">
+
+                    <div class="mb-4 d-flex justify-content-center">
+                        @if (!string.IsNullOrEmpty(Model.UImage))
+                        {
+                            <img src="~/images/@Model.UImage" alt="الصورة الشخصية" class="rounded-circle shadow border border-4 border-white" style="width: 150px; height: 150px; object-fit: cover;">
+                        }
+                        else
+                        {
+                            <div class="rounded-circle shadow border border-4 border-white bg-white d-flex align-items-center justify-content-center" style="width: 150px; height: 150px;">
+                                <i class="fas fa-user fa-5x text-secondary opacity-25"></i>
+                            </div>
+                        }
+                    </div>
+
+                    <h2 class="fw-bold mb-1">@Model.Name</h2>
+                    <p class="text-muted mb-4">
+                        <span class="badge bg-secondary px-3 py-2">@Model.Role</span>
+                    </p>
+
+                    <div class="card bg-white border-0 shadow-sm text-start mx-auto" style="max-width: 500px;">
+                        <div class="card-body">
+                            <div class="mb-3 border-bottom pb-2">
+                                <label class="text-muted small fw-bold">الاسم </label>
+                                <div class="fs-5 text-dark">
+                                    <i ></i> @Model.Name
+                                </div>
+                            </div>
+                            <div class="mb-3 border-bottom pb-2">
+                                <label class="text-muted small fw-bold">البريد الإلكتروني</label>
+                                <div class="fs-5 text-dark">
+                                    <i class="fas fa-envelope text-success me-2"></i> @Model.Email
+                                </div>
+                            </div>
+
+                            
+
+                        </div>
+                    </div>
+                                           
+
+                  <div class="mt-4">
+
+    @if (Context.Session.GetString("UserRole") == "Admin")
+    {
+        <a asp-controller="User" asp-action="Index2" class="btn btn-outline-success px-4 fw-bold">العودة للرئيسية</a>
+    }
+    else
+    {
+        <a asp-controller="User" asp-action="Index1" class="btn btn-outline-success px-4 fw-bold">العودة للرئيسية</a>
+    }
+    <a asp-controller="User" asp-action="Logout" class="btn btn-danger px-4 fw-bold">تسجيل الخروج</a>
+                </div>
+                    <div class="text-center mb-4">
+                        <a asp-action="ChangePassword" class="btn btn-outline-warning btn-sm fw-bold">
+                            <i class="fas fa-key me-1"></i> هل تريد تغيير كلمة المرور؟
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

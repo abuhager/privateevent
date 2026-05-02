@@ -1,0 +1,73 @@
+﻿@model IEnumerable<project.Models.Event>
+
+@{
+    ViewData["Title"] = "الفعاليات المتاحة";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <h2 class="text-success mb-4"><i class="fas fa-calendar-alt"></i> الفعاليات المتاحة</h2>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <form asp-action="EventsList" method="get" class="d-flex gap-2">
+                        <input type="text" name="searchString" class="form-control" placeholder="ابحث عن اسم الفعالية أو الموقع..." value="@ViewContext.HttpContext.Request.Query["searchString"]">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> بحث</button>
+                        <a asp-action="EventsList" class="btn btn-outline-secondary">إلغاء</a>
+                    </form>
+                </div>
+            </div>
+            <table class="table table-hover text-center align-middle">
+                <thead class="table-success">
+                    <tr>
+                        <th>عنوان الفعالية</th>
+                        <th>التاريخ</th>
+                        <th>الموقع</th>
+                        <th>السعة</th>
+                        <th>الحالة</th>
+                        <th>الإجراء</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        var myBooking = item.Rolls?.FirstOrDefault();
+                        string status = myBooking != null ? myBooking.States : "غير مسجل";
+
+                        <tr>
+                            <td class="fw-bold">@item.Title</td>
+                            <td>@item.Date.ToString("yyyy/MM/dd")</td>
+                            <td>@item.Location</td>
+                            <td>@item.Limit</td>
+                            <td>
+                                @if (status == "active")
+                                {
+                                    <span class="badge bg-success">محجوز</span>
+                                }
+                                else if (status == "cancelled")
+                                {
+                                    <span class="badge bg-danger">ملغي</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">غير مسجل</span>
+                                }
+                            </td>
+                            <td>
+                                <a asp-action="BookEvent" asp-route-eventId="@item.Id" class="btn btn-info btn-sm text-white">
+                                    <i class="fas fa-eye"></i> عرض التفاصيل
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @if (!Model.Any())
+            {
+                <div class="alert alert-warning text-center">لا توجد فعاليات متاحة حالياً.</div>
+            }
+        </div>
+    </div>
+</div>

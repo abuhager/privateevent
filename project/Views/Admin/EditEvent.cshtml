@@ -1,0 +1,70 @@
+﻿@model project.Models.Event
+@{
+    ViewBag.Title = "تعديل الفعالية";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-header bg-warning text-dark py-3">
+                    <h4 class="mb-0 text-center fw-bold">
+                        <i class="fas fa-edit me-2"></i> تعديل الفعالية
+                    </h4>
+                </div>
+                <div class="card-body p-4 bg-light">
+                    <form asp-action="EditEvent" method="post">
+                        <input type="hidden" asp-for="Id" /> <div class="mb-3">
+                            <label class="form-label fw-bold">عنوان الفعالية</label>
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">الوصف</label>
+                            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">التاريخ</label>
+                                <input asp-for="Date" type="date" class="form-control" />
+                                <span asp-validation-for="Date" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">الوقت</label>
+                                <input asp-for="StartTime" type="time" class="form-control" />
+                                <span asp-validation-for="StartTime" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">المكان</label>
+                                <input asp-for="Location" class="form-control" />
+                                <span asp-validation-for="Location" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">التخصص</label>
+                                <input asp-for="major" class="form-control" />
+                                <span asp-validation-for="major" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">الحد الأعلى للمقاعد</label>
+                            <input asp-for="Limit" type="number" class="form-control" />
+                            <span asp-validation-for="Limit" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Dashboard" class="btn btn-secondary me-md-2 px-4">إلغاء</a>
+                            <button type="submit" class="btn btn-warning px-5 fw-bold shadow-sm">حفظ التعديلات</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

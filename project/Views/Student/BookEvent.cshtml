@@ -1,0 +1,88 @@
+﻿@model project.Models.Event
+
+@{
+    ViewData["Title"] = "تفاصيل الفعالية";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // استقبال الحالة (active, waiting, or null)
+    string userStatus = ViewBag.UserStatus as string;
+    int currentCount = ViewBag.CurrentCount ?? 0;
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-success text-white">
+            <h3>@Model.Title</h3>
+        </div>
+        <div class="card-body">
+
+            @if (TempData["msg"] != null)
+            {
+                <div class="alert alert-info">@TempData["msg"]</div>
+            }
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <p><strong><i class="fas fa-clock"></i> التاريخ والوقت:</strong> @Model.Date.ToString("yyyy/MM/dd") - @Model.StartTime</p>
+                    <p><strong><i class="fas fa-map-marker-alt"></i> الموقع:</strong> @Model.Location</p>
+                    <p><strong><i class="fas fa-users"></i> المقاعد:</strong> @currentCount / @Model.Limit</p>
+                </div>
+                <div class="col-md-12 mt-3">
+                    <h5>الوصف:</h5>
+                    <p class="lead">@Model.Description</p>
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="d-flex justify-content-end gap-2">
+                <a asp-action="EventsList" class="btn btn-secondary">رجوع للقائمة</a>
+
+                @if (!string.IsNullOrEmpty(userStatus))
+                {
+                    // --- حالة 1: الطالب مسجل رسمياً (Active) ---
+                    @if (userStatus == "active")
+                    {
+                        <button class="btn btn-success disabled opacity-100">
+                            <i class="fas fa-check-circle me-2"></i> تم تأكيد حجزك
+                        </button>
+                    }
+                    // --- حالة 2: الطالب في قائمة الانتظار (Waiting) ---
+                    else if (userStatus == "waiting")
+                    {
+                        <button class="btn btn-warning disabled opacity-100 text-dark">
+                            <i class="fas fa-hourglass-half me-2"></i> أنت في قائمة الانتظار
+                        </button>
+                    }
+
+                    <a asp-action="CancelBooking" asp-route-eventId="@Model.Id" class="btn btn-outline-danger" onclick="return confirm('هل أنت متأكد من إلغاء الحجز/الانتظار؟')">
+                        انسحاب
+                    </a>
+                }
+                else
+                {
+                    // --- حالة 3: الطالب غير مسجل (جديد) ---
+                    <form asp-action="BookEvent" method="post">
+                        <input type="hidden" name="eventId" value="@Model.Id" />
+
+                        @if (currentCount >= Model.Limit)
+                        {
+                            <div class="alert alert-warning d-inline-block m-0 p-2 me-2">
+                                <small>العدد مكتمل</small>
+                            </div>
+                            <button type="submit" class="btn btn-warning px-4 text-dark fw-bold">
+                                <i class="fas fa-clock"></i> انضم لقائمة الانتظار
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="fas fa-ticket-alt"></i> تأكيد الحجز
+                            </button>
+                        }
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,23 @@
+@page
+@model LoginModel
+@{
+  ViewBag.Title = "????? ??????";
+}
+
+<h2>????? ??????</h2>
+<form method="post">
+    <div>
+        <label for="email">?????? ??????????:</label>
+      <input type="email" name="email" id="email" required />
+    </div>
+    <div>
+        <label for="password">???? ??????:</label>
+    <input type="password" name="password" id="password" required />
+    </div>
+ <button type="submit">????</button>
+</form>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <p style="color:red">@Model.ErrorMessage</p>
+}
