@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using project.Models;
+using ClosedXML.Excel;
 
 namespace project.Controllers
 {
@@ -19,27 +20,32 @@ namespace project.Controllers
         // --- لوحة التحكم (Dashboard) ---
         public IActionResult Dashboard()
         {
-            // 1. عدد الطلاب
-            ViewBag.StudentCount = _dbContext.Users.Count(u => u.Role == "Student");
+            var events = _dbContext.Events.ToList();
 
-            // 2. عدد الفعاليات القادمة فقط
-            ViewBag.EventCount = _dbContext.Events.Count(e => e.Date >= DateTime.Now);
+            // ✅ جمع بيانات الرسم البياني
+            // أسماء الفعاليات (للمحور الأفقي)
+            var eventTitles = events.Select(e => e.Title).ToList();
 
-            // 3. عدد الحجوزات النشطة للفعاليات القادمة (مؤشر للإقبال الحالي)
-            ViewBag.ActiveBookings = _dbContext.Rolls
-                .Include(r => r.Event)
-                .Count(r => r.States == "active" && r.Event.Date >= DateTime.Now);
+            // عدد الحجوزات النشطة لكل فعالية
+            var bookingCounts = events.Select(e =>
+                _dbContext.Rolls.Count(r => r.EventId == e.Id && r.States == "active")
+            ).ToList();
 
-            // 4. السعة الكلية المتاحة مستقبلاً
-            ViewBag.TotalCapacity = _dbContext.Events
-                .Where(e => e.Date >= DateTime.Now)
-                .Sum(e => e.Limit);
+            // الطاقة الاستيعابية لكل فعالية (Limit)
+            var capacities = events.Select(e => e.Limit).ToList();
 
-            // جلب القائمة مرتبة للأحدث
-            var events = _dbContext.Events.OrderByDescending(e => e.Date).ToList();
+            // ✅ تمرير البيانات للـ View
+            ViewBag.EventTitles = System.Text.Json.JsonSerializer.Serialize(eventTitles);
+            ViewBag.BookingCounts = System.Text.Json.JsonSerializer.Serialize(bookingCounts);
+            ViewBag.Capacities = System.Text.Json.JsonSerializer.Serialize(capacities);
+
+            // إجماليات للـ KPI cards
+            ViewBag.TotalEvents = events.Count;
+            ViewBag.TotalBookings = _dbContext.Rolls.Count(r => r.States == "active");
+            ViewBag.TotalUsers = _dbContext.Users.Count();
+
             return View(events);
         }
-
         // --- إضافة فعالية جديدة ---
         public IActionResult CreateEvent()
         {
@@ -136,5 +142,54 @@ namespace project.Controllers
 
             return View(ev);
         }
+
+public IActionResult ExportBookings(int eventId)
+    {
+        var ev = _dbContext.Events.Find(eventId);
+        if (ev == null) return NotFound();
+
+        // ✅ جلب الحجوزات مع بيانات الطلاب
+        var rolls = _dbContext.Rolls
+            .Where(r => r.EventId == eventId)
+            .Include(r => r.User)
+            .ToList();
+
+        using var workbook = new XLWorkbook();
+        var sheet = workbook.Worksheets.Add("الحجوزات");
+
+        // ✅ العناوين
+        sheet.Cell(1, 1).Value = "رقم الحجز";
+        sheet.Cell(1, 2).Value = "اسم الطالب";
+        sheet.Cell(1, 3).Value = "البريد الإلكتروني";
+        sheet.Cell(1, 4).Value = "الحالة";
+        sheet.Cell(1, 5).Value = "اسم الفعالية";
+
+        // ✅ تنسيق العناوين
+        var headerRow = sheet.Range("A1:E1");
+        headerRow.Style.Font.Bold = true;
+        headerRow.Style.Fill.BackgroundColor = XLColor.FromHtml("#198754");
+        headerRow.Style.Font.FontColor = XLColor.White;
+
+        // ✅ البيانات
+        for (int i = 0; i < rolls.Count; i++)
+        {
+            int row = i + 2;
+            sheet.Cell(row, 1).Value = rolls[i].Id;
+            sheet.Cell(row, 2).Value = rolls[i].User?.Name ?? "-";
+            sheet.Cell(row, 3).Value = rolls[i].User?.Email ?? "-";
+            sheet.Cell(row, 4).Value = rolls[i].States;
+            sheet.Cell(row, 5).Value = ev.Title;
+        }
+
+        // ✅ ضبط عرض الأعمدة تلقائياً
+        sheet.Columns().AdjustToContents();
+
+        using var stream = new MemoryStream();
+        workbook.SaveAs(stream);
+        stream.Position = 0;
+
+        var fileName = $"bookings-{ev.Title}-{DateTime.Now:yyyyMMdd}.xlsx";
+        return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
     }
+}
 }

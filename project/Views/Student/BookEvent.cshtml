@@ -4,7 +4,6 @@
     ViewData["Title"] = "تفاصيل الفعالية";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
-    // استقبال الحالة (active, waiting, or null)
     string userStatus = ViewBag.UserStatus as string;
     int currentCount = ViewBag.CurrentCount ?? 0;
 }
@@ -40,14 +39,19 @@
 
                 @if (!string.IsNullOrEmpty(userStatus))
                 {
-                    // --- حالة 1: الطالب مسجل رسمياً (Active) ---
                     @if (userStatus == "active")
                     {
                         <button class="btn btn-success disabled opacity-100">
                             <i class="fas fa-check-circle me-2"></i> تم تأكيد حجزك
                         </button>
+
+                        <a asp-action="DownloadTicket"
+                           asp-controller="Student"
+                           asp-route-eventId="@Model.Id"
+                           class="btn btn-outline-success">
+                            <i class="fas fa-file-pdf me-1"></i> تحميل التذكرة
+                        </a>
                     }
-                    // --- حالة 2: الطالب في قائمة الانتظار (Waiting) ---
                     else if (userStatus == "waiting")
                     {
                         <button class="btn btn-warning disabled opacity-100 text-dark">
@@ -55,13 +59,15 @@
                         </button>
                     }
 
-                    <a asp-action="CancelBooking" asp-route-eventId="@Model.Id" class="btn btn-outline-danger" onclick="return confirm('هل أنت متأكد من إلغاء الحجز/الانتظار؟')">
+                    <a asp-action="CancelBooking"
+                       asp-route-eventId="@Model.Id"
+                       class="btn btn-outline-danger"
+                       onclick="return confirm('هل أنت متأكد من إلغاء الحجز/الانتظار؟')">
                         انسحاب
                     </a>
                 }
                 else
                 {
-                    // --- حالة 3: الطالب غير مسجل (جديد) ---
                     <form asp-action="BookEvent" method="post">
                         <input type="hidden" name="eventId" value="@Model.Id" />
 
@@ -83,6 +89,7 @@
                     </form>
                 }
             </div>
+
         </div>
     </div>
 </div>
