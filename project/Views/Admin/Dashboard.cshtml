@@ -15,14 +15,18 @@
             </h2>
             <p class="text-muted mb-0">نظرة عامة وإدارة الفعاليات</p>
         </div>
-        <a asp-action="CreateEvent" class="btn btn-success px-4 py-2 shadow-sm fw-bold rounded-pill hover-scale">
-            <i class="fas fa-plus-circle me-2"></i> إضافة فعالية
-        </a>
+        <div class="d-flex gap-2 mb-3">
+            <a asp-controller="Admin" asp-action="CreateEvent" class="btn btn-success">
+                إضافة فعالية
+            </a>
+            <a asp-controller="Admin" asp-action="VerifyTicket" class="btn btn-outline-dark">
+                التحقق من التذاكر
+            </a>
+        </div>
     </div>
 
-    {{!-- ✅ KPI Cards --}}
     <div class="row g-3 mb-4">
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="card bg-primary text-white border-0 shadow-sm h-100">
                 <div class="card-body d-flex justify-content-between align-items-center">
                     <div>
@@ -33,11 +37,11 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="card bg-success text-white border-0 shadow-sm h-100">
                 <div class="card-body d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="text-uppercase mb-1 opacity-75">الفعاليات المتاحة</h6>
+                        <h6 class="text-uppercase mb-1 opacity-75">الفعاليات</h6>
                         <h2 class="mb-0 fw-bold">@ViewBag.EventCount</h2>
                     </div>
                     <i class="fas fa-calendar-check fa-2x opacity-50"></i>
@@ -56,6 +60,17 @@
             </div>
         </div>
         <div class="col-md-3">
+            <div class="card bg-dark text-white border-0 shadow-sm h-100">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-1 opacity-75">تم الحضور</h6>
+                        <h2 class="mb-0 fw-bold">@ViewBag.CheckedIn</h2>
+                    </div>
+                    <i class="fas fa-check-circle fa-2x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
             <div class="card bg-info text-white border-0 shadow-sm h-100">
                 <div class="card-body d-flex justify-content-between align-items-center">
                     <div>
@@ -68,7 +83,6 @@
         </div>
     </div>
 
-    {{!-- ✅ Charts --}}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <div class="row g-4 mb-5">
         <div class="col-lg-8">
@@ -143,7 +157,6 @@
         });
     </script>
 
-    {{!-- ✅ قائمة الفعاليات --}}
     @if (!Model.Any())
     {
         <div class="text-center py-5 bg-light rounded-3 shadow-sm">
@@ -212,7 +225,6 @@
                                     <a asp-action="EditEvent" asp-route-id="@ev.Id" class="btn btn-outline-secondary btn-sm flex-grow-1">
                                         <i class="fas fa-edit"></i> تعديل
                                     </a>
-                                    {{!-- ✅ زر تصدير Excel --}}
                                     <a asp-action="ExportBookings" asp-route-eventId="@ev.Id" class="btn btn-outline-success btn-sm flex-grow-1">
                                         <i class="fas fa-file-excel"></i> Excel
                                     </a>

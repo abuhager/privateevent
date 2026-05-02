@@ -1,0 +1,96 @@
+﻿@model project.Models.Event
+@{
+    ViewData["Title"] = "تذكرتي";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var roll = ViewBag.Roll as project.Models.Roll;
+    string qrBase64 = ViewBag.QrCodeBase64;
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <div class="card shadow-lg border-0" style="border-radius: 20px; overflow: hidden;">
+
+                <div class="card-header text-white text-center py-3"
+                     style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                    <h4 class="mb-0">
+                        <i class="fas fa-ticket-alt me-2"></i> تذكرة الفعالية
+                    </h4>
+                </div>
+
+                <div class="card-body p-4">
+
+                    <h3 class="text-center fw-bold mb-3">@Model.Title</h3>
+                    <hr />
+
+                    <div class="row mb-2">
+                        <div class="col-5 text-muted">
+                            <i class="fas fa-calendar me-1"></i> التاريخ:
+                        </div>
+                        <div class="col-7 fw-bold">@Model.Date.ToString("yyyy/MM/dd")</div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-5 text-muted">
+                            <i class="fas fa-clock me-1"></i> الوقت:
+                        </div>
+                        <div class="col-7 fw-bold">@Model.StartTime</div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-5 text-muted">
+                            <i class="fas fa-map-marker-alt me-1"></i> المكان:
+                        </div>
+                        <div class="col-7 fw-bold">@Model.Location</div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-5 text-muted">
+                            <i class="fas fa-graduation-cap me-1"></i> التخصص:
+                        </div>
+                        <div class="col-7 fw-bold">@Model.major</div>
+                    </div>
+
+                    @if (roll != null)
+                    {
+                        <div class="row mb-2">
+                            <div class="col-5 text-muted">
+                                <i class="fas fa-user me-1"></i> الاسم:
+                            </div>
+                            <div class="col-7 fw-bold">@roll.User?.Name</div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-5 text-muted">
+                                <i class="fas fa-user me-1"></i> الايميل:
+                            </div>
+                            <div class="col-7 fw-bold">@roll.User?.Email</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-5 text-muted">
+                                <i class="fas fa-hashtag me-1"></i> رقم الحجز:
+                            </div>
+                            <div class="col-7 fw-bold text-primary">#@roll.Id</div>
+                        </div>
+                    }
+
+                    <hr />
+
+                   
+
+                </div>
+
+                
+
+            </div>
+
+            <div class="text-center mt-3">
+                <a asp-action="EventsList" asp-controller="Student" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-right me-1"></i> العودة لقائمة الفعاليات
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>

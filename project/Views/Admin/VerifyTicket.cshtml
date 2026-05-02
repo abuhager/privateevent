@@ -1,0 +1,126 @@
+﻿@{
+    ViewData["Title"] = "التحقق من التذكرة";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    string status = ViewBag.Status as string ?? "";
+    string message = ViewBag.Message as string ?? "";
+    var roll = ViewBag.Roll as project.Models.Roll;
+    bool searched = ViewBag.Searched != null && (bool)ViewBag.Searched;
+
+    if (TempData["VerifyMessage"] != null)
+    {
+        message = TempData["VerifyMessage"].ToString();
+    }
+
+    string alertClass = "alert-danger";
+    if (status == "valid")
+        alertClass = "alert-success";
+    else if (status == "checkedin")
+        alertClass = "alert-primary";
+    else if (status == "cancelled")
+        alertClass = "alert-warning";
+    else if (status == "waiting")
+        alertClass = "alert-info";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+
+            <div class="card shadow-lg border-0" style="border-radius: 16px; overflow: hidden;">
+                <div class="card-header bg-dark text-white text-center py-3">
+                    <h4 class="mb-0">
+                        <i class="fas fa-search me-2"></i> التحقق من تذكرة الحجز
+                    </h4>
+                </div>
+
+                <div class="card-body p-4">
+
+                    <form method="get" asp-action="VerifyTicket" asp-controller="Admin" class="mb-4">
+                        <label class="form-label fw-bold">أدخل رقم الحجز:</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-hashtag"></i>
+                            </span>
+                            <input type="number"
+                                   name="rollId"
+                                   class="form-control form-control-lg"
+                                   placeholder="مثال: 42"
+                                   min="1"
+                                   required />
+                            <button type="submit" class="btn btn-dark px-4">
+                                <i class="fas fa-search me-1"></i> تحقق
+                            </button>
+                        </div>
+                    </form>
+
+                    @if (searched)
+                    {
+                        <div class="alert @alertClass text-center fw-bold fs-5">
+                            @message
+                        </div>
+
+                        @if (roll != null)
+                        {
+                            <div class="card border-0 bg-light p-3 mt-3">
+                                <div class="row mb-2">
+                                    <div class="col-5 text-muted">👤 الاسم:</div>
+                                    <div class="col-7 fw-bold">@roll.User?.Name</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-5 text-muted">📧 الإيميل:</div>
+                                    <div class="col-7 fw-bold">@roll.User?.Email</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-5 text-muted">🎫 الفعالية:</div>
+                                    <div class="col-7 fw-bold">@roll.Event?.Title</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-5 text-muted">📅 التاريخ:</div>
+                                    <div class="col-7 fw-bold">@roll.Event?.Date.ToString("yyyy/MM/dd")</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-5 text-muted">📍 المكان:</div>
+                                    <div class="col-7 fw-bold">@roll.Event?.Location</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-5 text-muted">🔖 رقم الحجز:</div>
+                                    <div class="col-7 fw-bold text-primary">#@roll.Id</div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-5 text-muted">📌 الحالة:</div>
+                                    <div class="col-7 fw-bold">@roll.States</div>
+                                </div>
+
+                                @if (roll.States == "active")
+                                {
+                                    <form method="post" asp-action="CheckInTicket" asp-controller="Admin">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="rollId" value="@roll.Id" />
+                                        <button type="submit" class="btn btn-success w-100">
+                                            <i class="fas fa-check-circle me-1"></i> تأكيد الحضور
+                                        </button>
+                                    </form>
+                                }
+                                else if (roll.States == "checkedin")
+                                {
+                                    <div class="alert alert-primary text-center mb-0">
+                                        تم استخدام هذه التذكرة مسبقاً
+                                    </div>
+                                }
+                            </div>
+                        }
+                    }
+
+                </div>
+
+                <div class="card-footer text-center py-2">
+                    <a asp-action="Dashboard" asp-controller="Admin" class="btn btn-outline-secondary btn-sm">
+                        ← العودة للداشبورد
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

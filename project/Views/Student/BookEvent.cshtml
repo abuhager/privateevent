@@ -6,6 +6,7 @@
 
     string userStatus = ViewBag.UserStatus as string;
     int currentCount = ViewBag.CurrentCount ?? 0;
+    int? rollId = ViewBag.RollId as int?;
 }
 
 <div class="container mt-5">
@@ -13,6 +14,7 @@
         <div class="card-header bg-success text-white">
             <h3>@Model.Title</h3>
         </div>
+
         <div class="card-body">
 
             @if (TempData["msg"] != null)
@@ -22,10 +24,20 @@
 
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <p><strong><i class="fas fa-clock"></i> التاريخ والوقت:</strong> @Model.Date.ToString("yyyy/MM/dd") - @Model.StartTime</p>
-                    <p><strong><i class="fas fa-map-marker-alt"></i> الموقع:</strong> @Model.Location</p>
-                    <p><strong><i class="fas fa-users"></i> المقاعد:</strong> @currentCount / @Model.Limit</p>
+                    <p>
+                        <strong><i class="fas fa-clock"></i> التاريخ والوقت:</strong>
+                        @Model.Date.ToString("yyyy/MM/dd") - @Model.StartTime.ToString(@"hh\:mm")
+                    </p>
+                    <p>
+                        <strong><i class="fas fa-map-marker-alt"></i> الموقع:</strong>
+                        @Model.Location
+                    </p>
+                    <p>
+                        <strong><i class="fas fa-users"></i> المقاعد:</strong>
+                        @currentCount / @Model.Limit
+                    </p>
                 </div>
+
                 <div class="col-md-12 mt-3">
                     <h5>الوصف:</h5>
                     <p class="lead">@Model.Description</p>
@@ -34,41 +46,79 @@
 
             <hr />
 
-            <div class="d-flex justify-content-end gap-2">
+            <div class="d-flex justify-content-end gap-2 flex-wrap">
                 <a asp-action="EventsList" class="btn btn-secondary">رجوع للقائمة</a>
 
-                @if (!string.IsNullOrEmpty(userStatus))
+                @if (userStatus == "active")
                 {
-                    @if (userStatus == "active")
-                    {
-                        <button class="btn btn-success disabled opacity-100">
-                            <i class="fas fa-check-circle me-2"></i> تم تأكيد حجزك
-                        </button>
+                    <button class="btn btn-success disabled opacity-100">
+                        <i class="fas fa-check-circle me-2"></i> تم تأكيد حجزك
+                    </button>
 
-                        <a asp-action="DownloadTicket"
-                           asp-controller="Student"
-                           asp-route-eventId="@Model.Id"
-                           class="btn btn-outline-success">
-                            <i class="fas fa-file-pdf me-1"></i> تحميل التذكرة
-                        </a>
-                    }
-                    else if (userStatus == "waiting")
+                    <a asp-action="DownloadTicket"
+                       asp-controller="Student"
+                       asp-route-eventId="@Model.Id"
+                       class="btn btn-outline-success">
+                        <i class="fas fa-file-pdf me-1"></i> تحميل التذكرة
+                    </a>
+
+                    @if (rollId.HasValue)
                     {
-                        <button class="btn btn-warning disabled opacity-100 text-dark">
-                            <i class="fas fa-hourglass-half me-2"></i> أنت في قائمة الانتظار
-                        </button>
+                        <a asp-action="MyTicket"
+                           asp-controller="Student"
+                           asp-route-rollId="@rollId.Value"
+                           class="btn btn-outline-primary">
+                            <i class="fas fa-qrcode me-1"></i> عرض QR التذكرة
+                        </a>
                     }
 
                     <a asp-action="CancelBooking"
                        asp-route-eventId="@Model.Id"
                        class="btn btn-outline-danger"
-                       onclick="return confirm('هل أنت متأكد من إلغاء الحجز/الانتظار؟')">
+                       onclick="return confirm('هل أنت متأكد من إلغاء الحجز؟')">
+                        انسحاب
+                    </a>
+                }
+                else if (userStatus == "checkedin")
+                {
+                    <button class="btn btn-primary disabled opacity-100">
+                        <i class="fas fa-check-double me-2"></i> تم تسجيل حضورك
+                    </button>
+
+                    <a asp-action="DownloadTicket"
+                       asp-controller="Student"
+                       asp-route-eventId="@Model.Id"
+                       class="btn btn-outline-success">
+                        <i class="fas fa-file-pdf me-1"></i> تحميل التذكرة
+                    </a>
+
+                    @if (rollId.HasValue)
+                    {
+                        <a asp-action="MyTicket"
+                           asp-controller="Student"
+                           asp-route-rollId="@rollId.Value"
+                           class="btn btn-outline-primary">
+                            <i class="fas fa-qrcode me-1"></i> عرض  التذكرة
+                        </a>
+                    }
+                }
+                else if (userStatus == "waiting")
+                {
+                    <button class="btn btn-warning disabled opacity-100 text-dark">
+                        <i class="fas fa-hourglass-half me-2"></i> أنت في قائمة الانتظار
+                    </button>
+
+                    <a asp-action="CancelBooking"
+                       asp-route-eventId="@Model.Id"
+                       class="btn btn-outline-danger"
+                       onclick="return confirm('هل أنت متأكد من الانسحاب من قائمة الانتظار؟')">
                         انسحاب
                     </a>
                 }
                 else
                 {
-                    <form asp-action="BookEvent" method="post">
+                    <form asp-action="BookEvent" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
                         <input type="hidden" name="eventId" value="@Model.Id" />
 
                         @if (currentCount >= Model.Limit)
@@ -76,6 +126,7 @@
                             <div class="alert alert-warning d-inline-block m-0 p-2 me-2">
                                 <small>العدد مكتمل</small>
                             </div>
+
                             <button type="submit" class="btn btn-warning px-4 text-dark fw-bold">
                                 <i class="fas fa-clock"></i> انضم لقائمة الانتظار
                             </button>

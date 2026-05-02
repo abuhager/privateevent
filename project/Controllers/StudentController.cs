@@ -2,9 +2,10 @@
 using Microsoft.EntityFrameworkCore;
 using project.Models;
 using QuestPDF.Helpers;
-
+using QRCoder;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
+
 namespace project.Controllers
 {
     [SessionCheck("Student")]
@@ -22,14 +23,15 @@ namespace project.Controllers
             int userId = HttpContext.Session.GetInt32("UserId").Value;
 
             var eventsQuery = _dbContext.Events
-    .Include(e => e.Rolls.Where(r => r.UserId == userId))
-    .OrderByDescending(e => e.Date)      // رتب تنازلياً حسب التاريخ
-    .ThenByDescending(e => e.StartTime)  // ثم تنازلياً حسب الوقت
-    .AsQueryable();
+                .Include(e => e.Rolls.Where(r => r.UserId == userId))
+                .OrderByDescending(e => e.Date)
+                .ThenByDescending(e => e.StartTime)
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(searchString))
             {
-                eventsQuery = eventsQuery.Where(e => e.Title.Contains(searchString) || e.Location.Contains(searchString));
+                eventsQuery = eventsQuery.Where(e =>
+                    e.Title.Contains(searchString) || e.Location.Contains(searchString));
             }
 
             return View(eventsQuery.ToList());
@@ -46,11 +48,14 @@ namespace project.Controllers
 
             int userId = HttpContext.Session.GetInt32("UserId").Value;
 
-            var roll = _dbContext.Rolls.FirstOrDefault(r => r.EventId == eventId && r.UserId == userId);
+            var roll = _dbContext.Rolls
+                .FirstOrDefault(r => r.EventId == eventId && r.UserId == userId);
 
-            // ✅ تمرير الحالة للـ View
             ViewBag.UserStatus = roll?.States;
-            ViewBag.CurrentCount = _dbContext.Rolls.Count(r => r.EventId == eventId && r.States == "active");
+            ViewBag.CurrentCount = _dbContext.Rolls.Count(r =>
+                r.EventId == eventId &&
+                (r.States == "active" || r.States == "checkedin"));
+            ViewBag.RollId = roll?.Id;
 
             return View(ev);
         }
@@ -65,15 +70,21 @@ namespace project.Controllers
             var ev = _dbContext.Events.Find(eventId);
             if (ev == null) return NotFound();
 
-            var existingRoll = _dbContext.Rolls.FirstOrDefault(r => r.EventId == eventId && r.UserId == userId);
+            var existingRoll = _dbContext.Rolls
+                .FirstOrDefault(r => r.EventId == eventId && r.UserId == userId);
 
-            if (existingRoll != null && (existingRoll.States == "active" || existingRoll.States == "waiting"))
+            if (existingRoll != null &&
+                (existingRoll.States == "active" ||
+                 existingRoll.States == "waiting" ||
+                 existingRoll.States == "checkedin"))
             {
                 TempData["msg"] = "أنت مسجل في هذه الفعالية مسبقاً!";
                 return RedirectToAction("BookEvent", new { eventId = eventId });
             }
 
-            int activeBookings = _dbContext.Rolls.Count(r => r.EventId == eventId && r.States == "active");
+            int activeBookings = _dbContext.Rolls.Count(r =>
+                r.EventId == eventId &&
+                (r.States == "active" || r.States == "checkedin"));
 
             string newStatus = "active";
             string message = "تم تأكيد الحجز بنجاح!";
@@ -103,6 +114,7 @@ namespace project.Controllers
 
             _dbContext.SaveChanges();
             TempData["msg"] = message;
+
             return RedirectToAction("BookEvent", new { eventId = eventId });
         }
 
@@ -110,7 +122,10 @@ namespace project.Controllers
         {
             int userId = HttpContext.Session.GetInt32("UserId").Value;
 
-            var currentRoll = _dbContext.Rolls.FirstOrDefault(r => r.EventId == eventId && r.UserId == userId && r.States == "active");
+            var currentRoll = _dbContext.Rolls.FirstOrDefault(r =>
+                r.EventId == eventId &&
+                r.UserId == userId &&
+                (r.States == "active" || r.States == "checkedin"));
 
             if (currentRoll != null)
             {
@@ -127,11 +142,17 @@ namespace project.Controllers
                 }
 
                 _dbContext.SaveChanges();
-                TempData["msg"] = nextInQueue != null ? "تم إلغاء حجزك ودخول طالب من الانتظار مكانك." : "تم إلغاء الحجز.";
+                TempData["msg"] = nextInQueue != null
+                    ? "تم إلغاء حجزك ودخول طالب من الانتظار مكانك."
+                    : "تم إلغاء الحجز.";
             }
             else
             {
-                var waitingRoll = _dbContext.Rolls.FirstOrDefault(r => r.EventId == eventId && r.UserId == userId && r.States == "waiting");
+                var waitingRoll = _dbContext.Rolls.FirstOrDefault(r =>
+                    r.EventId == eventId &&
+                    r.UserId == userId &&
+                    r.States == "waiting");
+
                 if (waitingRoll != null)
                 {
                     waitingRoll.States = "cancelled";
@@ -141,6 +162,30 @@ namespace project.Controllers
             }
 
             return RedirectToAction("BookEvent", new { eventId = eventId });
+        }
+
+        public IActionResult MyTicket(int rollId)
+        {
+            if (HttpContext.Session.GetInt32("UserId") == null)
+                return RedirectToAction("Log", "Login");
+
+            int userId = HttpContext.Session.GetInt32("UserId").Value;
+
+            var roll = _dbContext.Rolls
+                .Include(r => r.Event)
+                .Include(r => r.User)
+                .FirstOrDefault(r => r.Id == rollId && r.UserId == userId);
+
+            if (roll == null || (roll.States != "active" && roll.States != "checkedin"))
+            {
+                TempData["msg"] = "لا توجد تذكرة صالحة بهذا الرقم.";
+                return RedirectToAction("EventsList");
+            }
+
+        
+            ViewBag.Roll = roll;
+
+            return View(roll.Event);
         }
 
         public IActionResult MyBookings()
@@ -155,6 +200,7 @@ namespace project.Controllers
 
             return View(myBookings);
         }
+
         public IActionResult DownloadTicket(int eventId)
         {
             if (HttpContext.Session.GetInt32("UserId") == null)
@@ -165,14 +211,13 @@ namespace project.Controllers
             var user = _dbContext.Users.Find(userId);
             var ev = _dbContext.Events.Find(eventId);
             var roll = _dbContext.Rolls.FirstOrDefault(r =>
-                           r.EventId == eventId &&
-                           r.UserId == userId &&
-                           r.States == "active");
+                r.EventId == eventId &&
+                r.UserId == userId &&
+                (r.States == "active" || r.States == "checkedin"));
 
             if (user == null || ev == null || roll == null)
                 return NotFound();
 
-            // ✅ تعريف TextStyle عربي يُستخدم في كل النص
             var arabicStyle = TextStyle.Default
                 .FontFamily("Arial")
                 .FontSize(12);
@@ -183,13 +228,10 @@ namespace project.Controllers
                 {
                     page.Size(PageSizes.A4);
                     page.Margin(40);
-
-                    // ✅ تطبيق الخط العربي على كامل الصفحة
                     page.DefaultTextStyle(arabicStyle);
 
                     page.Content().Column(col =>
                     {
-                        // العنوان
                         col.Item().AlignCenter()
                             .Text("تذكرة فعالية")
                             .FontSize(28).Bold().FontColor(Colors.Green.Medium);
@@ -197,11 +239,9 @@ namespace project.Controllers
                         col.Item().PaddingVertical(10)
                             .LineHorizontal(1).LineColor(Colors.Grey.Lighten2);
 
-                        // اسم الفعالية
                         col.Item().AlignCenter().PaddingBottom(20)
                             .Text(ev.Title).FontSize(22).Bold();
 
-                        // جدول التفاصيل
                         col.Item().Table(table =>
                         {
                             table.ColumnsDefinition(c =>
@@ -227,6 +267,9 @@ namespace project.Controllers
 
                             table.Cell().Padding(8).Text("رقم الحجز").Bold();
                             table.Cell().Padding(8).Text($"#{roll.Id:D5}");
+
+                            table.Cell().Padding(8).Text("الحالة").Bold();
+                            table.Cell().Padding(8).Text(roll.States == "checkedin" ? "تم الحضور" : "حجز مؤكد");
                         });
 
                         col.Item().PaddingVertical(10)
