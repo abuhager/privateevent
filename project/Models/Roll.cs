@@ -6,14 +6,14 @@ namespace project.Models
     {
         public int Id { get; set; }
 
-        public string States { get; set; }
+        public string States { get; set; } = string.Empty;
         public DateTime BookingTime { get; set; }
         public int UserId { get; set; } 
         [ForeignKey("UserId")] 
-        public User User { get; set; } 
+        public User User { get; set; } = null!;
 
         public int EventId { get; set; } 
         [ForeignKey("EventId")]
-        public Event Event { get; set; } 
+        public Event Event { get; set; } = null!;
     }
 }

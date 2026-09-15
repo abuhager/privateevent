@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using project.Models;
 using QuestPDF.Helpers;
-using QRCoder;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
 
@@ -18,9 +17,17 @@ namespace project.Controllers
             _dbContext = dbContext;
         }
 
+        private bool TryGetCurrentUserId(out int userId)
+        {
+            var sessionUserId = HttpContext.Session.GetInt32("UserId");
+            userId = sessionUserId.GetValueOrDefault();
+            return sessionUserId.HasValue;
+        }
+
         public IActionResult EventsList(string searchString)
         {
-            int userId = HttpContext.Session.GetInt32("UserId").Value;
+            if (!TryGetCurrentUserId(out var userId))
+                return RedirectToAction("Log", "Login");
 
             var eventsQuery = _dbContext.Events
                 .Include(e => e.Rolls.Where(r => r.UserId == userId))
@@ -40,13 +47,11 @@ namespace project.Controllers
         [HttpGet]
         public IActionResult BookEvent(int eventId)
         {
-            if (HttpContext.Session.GetInt32("UserId") == null)
+            if (!TryGetCurrentUserId(out var userId))
                 return RedirectToAction("Log", "Login");
 
             var ev = _dbContext.Events.Find(eventId);
             if (ev == null) return NotFound();
-
-            int userId = HttpContext.Session.GetInt32("UserId").Value;
 
             var roll = _dbContext.Rolls
                 .FirstOrDefault(r => r.EventId == eventId && r.UserId == userId);
@@ -65,7 +70,8 @@ namespace project.Controllers
         [ActionName("BookEvent")]
         public IActionResult BookEventPost(int eventId)
         {
-            int userId = HttpContext.Session.GetInt32("UserId").Value;
+            if (!TryGetCurrentUserId(out var userId))
+                return RedirectToAction("Log", "Login");
 
             var ev = _dbContext.Events.Find(eventId);
             if (ev == null) return NotFound();
@@ -118,14 +124,17 @@ namespace project.Controllers
             return RedirectToAction("BookEvent", new { eventId = eventId });
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult CancelBooking(int eventId)
         {
-            int userId = HttpContext.Session.GetInt32("UserId").Value;
+            if (!TryGetCurrentUserId(out var userId))
+                return RedirectToAction("Log", "Login");
 
             var currentRoll = _dbContext.Rolls.FirstOrDefault(r =>
                 r.EventId == eventId &&
                 r.UserId == userId &&
-                (r.States == "active" || r.States == "checkedin"));
+                r.States == "active");
 
             if (currentRoll != null)
             {
@@ -166,10 +175,8 @@ namespace project.Controllers
 
         public IActionResult MyTicket(int rollId)
         {
-            if (HttpContext.Session.GetInt32("UserId") == null)
+            if (!TryGetCurrentUserId(out var userId))
                 return RedirectToAction("Log", "Login");
-
-            int userId = HttpContext.Session.GetInt32("UserId").Value;
 
             var roll = _dbContext.Rolls
                 .Include(r => r.Event)
@@ -190,7 +197,8 @@ namespace project.Controllers
 
         public IActionResult MyBookings()
         {
-            int userId = HttpContext.Session.GetInt32("UserId").Value;
+            if (!TryGetCurrentUserId(out var userId))
+                return RedirectToAction("Log", "Login");
 
             var myBookings = _dbContext.Rolls
                 .Include(r => r.Event)
@@ -203,10 +211,8 @@ namespace project.Controllers
 
         public IActionResult DownloadTicket(int eventId)
         {
-            if (HttpContext.Session.GetInt32("UserId") == null)
+            if (!TryGetCurrentUserId(out var userId))
                 return RedirectToAction("Log", "Login");
-
-            int userId = HttpContext.Session.GetInt32("UserId").Value;
 
             var user = _dbContext.Users.Find(userId);
             var ev = _dbContext.Events.Find(eventId);
@@ -219,7 +225,7 @@ namespace project.Controllers
                 return NotFound();
 
             var arabicStyle = TextStyle.Default
-                .FontFamily("Arial")
+                .FontFamily("Noto Sans Arabic")
                 .FontSize(12);
 
             var pdf = Document.Create(container =>

@@ -22,7 +22,7 @@ namespace project.Controllers
                 return View(); 
         }
         [HttpPost]
-        [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Log(string email, string password)
         {
             var user = _context.Users.FirstOrDefault(u => u.Email == email);
