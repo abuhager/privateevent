@@ -7,10 +7,7 @@
     var roll = ViewBag.Roll as project.Models.Roll;
     bool searched = ViewBag.Searched != null && (bool)ViewBag.Searched;
 
-    if (TempData["VerifyMessage"] != null)
-    {
-        message = TempData["VerifyMessage"].ToString();
-    }
+    message = TempData["VerifyMessage"]?.ToString() ?? message;
 
     string alertClass = "alert-danger";
     if (status == "valid")

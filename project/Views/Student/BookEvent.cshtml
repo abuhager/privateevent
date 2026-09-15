@@ -4,7 +4,7 @@
     ViewData["Title"] = "تفاصيل الفعالية";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
-    string userStatus = ViewBag.UserStatus as string;
+    string? userStatus = ViewBag.UserStatus as string;
     int currentCount = ViewBag.CurrentCount ?? 0;
     int? rollId = ViewBag.RollId as int?;
 }
@@ -68,16 +68,18 @@
                            asp-controller="Student"
                            asp-route-rollId="@rollId.Value"
                            class="btn btn-outline-primary">
-                            <i class="fas fa-qrcode me-1"></i> عرض QR التذكرة
+                            <i class="fas fa-ticket-alt me-1"></i> عرض تفاصيل التذكرة
                         </a>
                     }
 
-                    <a asp-action="CancelBooking"
-                       asp-route-eventId="@Model.Id"
-                       class="btn btn-outline-danger"
-                       onclick="return confirm('هل أنت متأكد من إلغاء الحجز؟')">
-                        انسحاب
-                    </a>
+                    <form asp-action="CancelBooking" method="post" class="d-inline">
+                        <input type="hidden" name="eventId" value="@Model.Id" />
+                        <button type="submit"
+                                class="btn btn-outline-danger"
+                                onclick="return confirm('هل أنت متأكد من إلغاء الحجز؟')">
+                            انسحاب
+                        </button>
+                    </form>
                 }
                 else if (userStatus == "checkedin")
                 {
@@ -98,7 +100,7 @@
                            asp-controller="Student"
                            asp-route-rollId="@rollId.Value"
                            class="btn btn-outline-primary">
-                            <i class="fas fa-qrcode me-1"></i> عرض  التذكرة
+                            <i class="fas fa-ticket-alt me-1"></i> عرض تفاصيل التذكرة
                         </a>
                     }
                 }
@@ -108,12 +110,14 @@
                         <i class="fas fa-hourglass-half me-2"></i> أنت في قائمة الانتظار
                     </button>
 
-                    <a asp-action="CancelBooking"
-                       asp-route-eventId="@Model.Id"
-                       class="btn btn-outline-danger"
-                       onclick="return confirm('هل أنت متأكد من الانسحاب من قائمة الانتظار؟')">
-                        انسحاب
-                    </a>
+                    <form asp-action="CancelBooking" method="post" class="d-inline">
+                        <input type="hidden" name="eventId" value="@Model.Id" />
+                        <button type="submit"
+                                class="btn btn-outline-danger"
+                                onclick="return confirm('هل أنت متأكد من الانسحاب من قائمة الانتظار؟')">
+                            انسحاب
+                        </button>
+                    </form>
                 }
                 else
                 {

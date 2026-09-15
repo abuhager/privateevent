@@ -1,5 +1,12 @@
-﻿@{
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
     ViewBag.Title = "University Event Management";
+    var showDemoCredentials = string.Equals(
+        Configuration["Database:Provider"],
+        "InMemory",
+        StringComparison.OrdinalIgnoreCase) ||
+        Configuration.GetValue<bool>("Database:SeedDemoData");
 }
 
 <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 100vh; background: #f5f7fa;">
@@ -29,12 +36,15 @@
             <div style="color:red; margin-top: 10px;">@ViewBag.Error</div>
         }
 
-        <div class="card mt-3">
-            <div class="card-body p-2">
-                <strong>Demo Credentials:</strong><br>
-                <span><b>Admin:</b> admin@example.com / Admin123!</span><br>
-                <span><b>Student:</b> student@example.com / Student123!</span>
+        @if (showDemoCredentials)
+        {
+            <div class="card mt-3">
+                <div class="card-body p-2">
+                    <strong>Demo Credentials:</strong><br>
+                    <span><b>Admin:</b> admin@example.com / Admin123!</span><br>
+                    <span><b>Student:</b> student@example.com / Student123!</span>
+                </div>
             </div>
-        </div>
+        }
     </div>
 </div>

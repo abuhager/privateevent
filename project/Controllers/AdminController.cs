@@ -74,6 +74,14 @@ namespace project.Controllers
             return View(ev);
         }
 
+        [HttpGet]
+        public IActionResult DeleteEvent(int id)
+        {
+            var ev = _dbContext.Events.Find(id);
+            if (ev == null) return NotFound();
+            return View(ev);
+        }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]

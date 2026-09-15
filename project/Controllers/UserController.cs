@@ -28,7 +28,7 @@ namespace project.Controllers
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null) return RedirectToAction("Log", "Login");
-            string role = HttpContext.Session.GetString("UserRole");
+            string? role = HttpContext.Session.GetString("UserRole");
             if (role == "Student")
                 return View();
             else
@@ -41,7 +41,7 @@ namespace project.Controllers
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null) return RedirectToAction("Log", "Login");
-            string role=HttpContext.Session.GetString("UserRole");
+            string? role=HttpContext.Session.GetString("UserRole");
             if (role== "Admin")
             return View();
             else

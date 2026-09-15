@@ -1,12 +1,11 @@
-﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
-@{
+﻿@{
     Context.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
     Context.Response.Headers["Pragma"] = "no-cache";
     Context.Response.Headers["Expires"] = "0";
 
-    var userRole = HttpContextAccessor.HttpContext.Session.GetString("UserRole");
-    var userId = HttpContextAccessor.HttpContext.Session.GetInt32("UserId");
-    var username = HttpContextAccessor.HttpContext.Session.GetString("UserName");
+    var userRole = Context.Session.GetString("UserRole");
+    var userId = Context.Session.GetInt32("UserId");
+    var username = Context.Session.GetString("UserName");
 }
 
 <!DOCTYPE html>
